@@ -14,5 +14,11 @@
   "type": "module",
   "workspaces": [
     "src/my_icp_project_frontend"
-  ]
+  ],
+  "dependencies": {
+    "@dfinity/agent": "^2.1.3",
+    "@dfinity/candid": "^2.1.3",
+    "@dfinity/principal": "^2.1.3",
+    "react-router-dom": "^6.28.0"
+  }
 }

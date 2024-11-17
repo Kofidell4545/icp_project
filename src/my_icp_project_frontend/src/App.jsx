@@ -1,30 +1,38 @@
-import { useState } from 'react';
-import { my_icp_project_backend } from 'declarations/my_icp_project_backend';
+// src/App.jsx
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Balance from "./pages/Balance";
+import { my_icp_project_backend } from "declarations/my_icp_project_backend";
 
 function App() {
-  const [greeting, setGreeting] = useState('');
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    my_icp_project_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
-
   return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
+    <Router>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/register">Register</Link>
+          </li>
+          <li>
+            <Link to="/login">Login</Link>
+          </li>
+          <li>
+            <Link to="/balance">Check Balance</Link>
+          </li>
+        </ul>
+      </nav>
+      <Switch>
+        <Route path="/register" component={Register} />
+        <Route path="/login" component={Login} />
+        <Route path="/balance" component={Balance} />
+        <Route path="/" exact>
+          <h1>Welcome to the User Account System</h1>
+        </Route>
+        <Route>
+          <h1>404 - Not Found</h1> {/* Fallback route for undefined paths */}
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 
