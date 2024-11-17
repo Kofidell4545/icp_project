@@ -1,56 +1,82 @@
-
 import HashMap "mo:base/HashMap";
-import Debug "mo:base/Debug"; // For debugging
-import Option "mo:base/Option";
+import Result "mo:base/Result";
+import Text "mo:base/Text";
 
-actor UserAccount {
+actor {
 
-    type User = {
-        name: Text;
-        phone: Text;
-        password: Text;
-        balance: Nat;
-    };
-    var users: HashMap.Text<User> = HashMap.new<Text, User>();
-
-    public func register(name: Text, phone: Text, password: Text) : async Text {
-        if (HashMap.contains(users, phone)) {
-            return "User already exists";
-        };
-        let user = { name = name; phone = phone; password = password; balance = 0 };
-        HashMap.put(users, phone, user);
-        return "User registered successfully";
+    // Defining the structure of a User Account
+    public type UserAccount = {
+        name : Text;
+        password : Text;
+        balance : Nat;
     };
 
-   public func login(phone: Text, password: Text) : async Text {
-    // Simplified for debugging
-    return "Debugging login function"; // Check if this works
-};
+    // HashMap to store user accounts: Key = Phone number (represented as Text), Value = UserAccount
+    let userAccounts : HashMap.HashMap<Text, UserAccount> = HashMap.HashMap<Text, UserAccount>(0, Text.equal, Text.hash);
 
-   public func checkBalance(phone: Text) : async Nat {
-    switch (HashMap.get(users, phone)) {
-        case (null) { return 0; }; // User not found
-        case (some(user)) { return user.balance; };  // Corrected pattern matching
-    };
-    return 0; // Added to handle any unexpected cases
-};
-
- public func deposit(phone: Text, amount: Nat) : async Text {
-    switch (HashMap.get(users, phone)) {
-        case null { 
-            return "User not found"; 
-        };
-        case (some user) { // Corrected pattern matching
-            let updatedUser = {
-                name = user.name;
-                phone = user.phone;
-                password = user.password;
-                balance = user.balance + amount; // Update balance immutably
+    // Register a new user
+    public shared func register(name : Text, phone : Text, password : Text) : async Result.Result<Text, Text> {
+        switch (userAccounts.get(phone)) {
+            case (null) {
+                let newUser : UserAccount = {
+                    name = name;
+                    password = password;
+                    balance = 0;
+                };
+                userAccounts.put(phone, newUser);
+                return #ok("Registration successful");
             };
-            HashMap.put(users, phone, updatedUser); // Save the updated user back
-            return "Deposit successful";
+            case (?_) {
+                return #err("Account already exists");
+            };
         };
     };
-};
+
+    // Log in user by phone number and password
+    public query func login(phone : Text, password : Text) : async Result.Result<Text, Text> {
+        switch (userAccounts.get(phone)) {
+            case (null) {
+                return #err("Account not found");
+            };
+            case (?user) {
+                if (user.password == password) {
+                    return #ok("Login successful");
+                } else {
+                    return #err("Incorrect password");
+                };
+            };
+        };
+    };
+
+    // Check the account balance of a user
+    public query func check_balance(phone : Text) : async Nat {
+        switch (userAccounts.get(phone)) {
+            case (null) {
+                return 0;
+            };
+            case (?user) {
+                return user.balance;
+            };
+        };
+    };
+
+    // Deposit money into user account
+    public shared func deposit(phone : Text, amount : Nat) : async Result.Result<Text, Text> {
+        switch (userAccounts.get(phone)) {
+            case (null) {
+                return #err("Account not found");
+            };
+            case (?user) {
+                let updatedBalance = user.balance + amount;
+                let updatedUser : UserAccount = {
+                    name = user.name;
+                    password = user.password;
+                    balance = updatedBalance;
+                };
+                userAccounts.put(phone, updatedUser);
+                return #ok("Deposit successful");
+            };
+        };
+    };
 
 };
