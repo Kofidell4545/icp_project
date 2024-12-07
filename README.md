@@ -1,59 +1,105 @@
-# `my_icp_project`
+# SUSUCHAIN A SAVINGS ACCOUNTS ON THE ICP BLOCKCHAIN
 
-Welcome to your new `my_icp_project` project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+This project is a blockchain-based savings account system deployed on the Internet Computer Protocol (ICP) platform. Users can register, log in, deposit funds, and check their account balances. All user data and transactions are securely recorded on the blockchain using the Motoko programming language.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+## Features
 
-To learn more before you start working with `my_icp_project`, see the following documentation available online:
+- **User Registration**: Create an account by providing your name, phone number, and password.
+- **Secure Login**: Authenticate using your phone number and password.
+- **Deposit Funds**: Add money to your savings account.
+- **Balance Inquiry**: Check your current account balance.
+- **Blockchain Storage**: All operations are securely stored and processed on the blockchain.
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Motoko Programming Language Guide](https://internetcomputer.org/docs/current/motoko/main/motoko)
-- [Motoko Language Quick Reference](https://internetcomputer.org/docs/current/motoko/main/language-manual)
+## Installation
 
-If you want to start working on your project right away, you might want to try the following commands:
+1. **Prerequisites**:
+   - Install [DFX SDK](https://internetcomputer.org/docs/current/developer-docs/quickstart/dfx-quickstart/).
+   - Ensure you have a working Motoko development environment.
 
+2. **Clone the Repository**:
+   ```bash
+   git clone <repository-url>
+   cd <repository-name>
+   ```
+
+3. **Deploy the Canister**:
+   ```bash
+   dfx start --background
+   dfx deploy
+   ```
+
+## Usage
+
+### Register a User
 ```bash
-cd my_icp_project/
-dfx help
-dfx canister --help
+// Example Call
+await UserAccount.register("Alice", "1234567890", "password123");
 ```
+- **Parameters**:
+  - `name` (Text): Full name of the user.
+  - `phone` (Text): Phone number as a unique identifier.
+  - `password` (Text): Password for secure login.
+- **Response**:
+  - Success: "Registration successful"
+  - Failure: "Account already exists"
 
-## Running the project locally
-
-If you want to test your project locally, you can use the following commands:
-
+### Log In
 ```bash
-# Starts the replica, running in the background
-dfx start --background
-
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
+// Example Call
+await UserAccount.login("1234567890", "password123");
 ```
+- **Parameters**:
+  - `phone` (Text): Registered phone number.
+  - `password` (Text): Password.
+- **Response**:
+  - Success: "Login successful"
+  - Failure: "Incorrect password" or "Account not found"
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
-
-If you have made changes to your backend canister, you can generate a new candid interface with
-
+### Deposit Funds
 ```bash
-npm run generate
+// Example Call
+await UserAccount.deposit("1234567890", 500);
 ```
+- **Parameters**:
+  - `phone` (Text): Registered phone number.
+  - `amount` (Nat): Amount to deposit.
+- **Response**:
+  - Success: "Deposit successful"
+  - Failure: "Account not found"
 
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
-
-If you are making frontend changes, you can start a development server with
-
+### Check Balance
 ```bash
-npm start
+// Example Call
+await UserAccount.checkBalance("1234567890");
 ```
+- **Parameters**:
+  - `phone` (Text): Registered phone number.
+- **Response**:
+  - Returns the current balance (Nat).
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+## Code Overview
 
-### Note on frontend environment variables
+### Structure
+- **`register`**: Registers a new user and initializes their balance to 0.
+- **`login`**: Authenticates a user by matching their phone number and password.
+- **`checkBalance`**: Retrieves the balance of the user.
+- **`deposit`**: Adds the specified amount to the user’s balance.
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
+### Dependencies
+- **`HashMap`**: Used to store user data in a key-value format.
+- **`Result`**: Handles success and error states.
+- **`Option`**: Manages optional values for safe access.
 
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+## Contributing
+
+Feel free to fork the repository and submit pull requests. For major changes, please open an issue to discuss what you’d like to change.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Acknowledgments
+
+- [DFINITY Foundation](https://dfinity.org/) for the ICP platform.
+- The developers of the Motoko language.
+
